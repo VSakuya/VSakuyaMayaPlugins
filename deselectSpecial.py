@@ -3,6 +3,7 @@ import maya.OpenMaya as OpenMaya
 import maya.OpenMayaMPx as OpenMayaMPx
 import maya.cmds as cmds
 
+# Intro: deselect objects/components which All % DeselectPerCom + Delta
 # Plug-in information:
 kPluginCmdName          = 'vsaDeselectSpecial'
 
@@ -45,10 +46,8 @@ class DeselectSpecialCommand( OpenMayaMPx.MPxCommand):
 
     def doIt( self, args ):
         ''' Command Execution '''
-
         # Parse the passed arguments
         self.parseArgs( args )
-
         # Create an instance of MDagModifier to keep track of the created objects,
         # and to undo their creation in our undoIt() function
         self.dagModifier = OpenMaya.MDagModifier()
@@ -78,10 +77,8 @@ class DeselectSpecialCommand( OpenMayaMPx.MPxCommand):
 
         # create new window
         self.window = cmds.window(self.window, title=self.title, widthHeight=self.size)
-
         cmds.columnLayout(adjustableColumn=True)
-
-
+        #Controls
         self.dscIntInput = cmds.intSliderGrp(field=True, label='Deselect per component: ',
                                         minValue=2, value=self.deselectPerCom)
 
@@ -130,7 +127,6 @@ def syntaxCreator():
     syntax.addFlag(kDeltaFlag, kDeltaLongFlag, OpenMaya.MSyntax.kDouble)
     return syntax
 
-
 def initializePlugin(mobject):
     ''' Initializes the plug-in. '''
     mplugin = OpenMayaMPx.MFnPlugin(mobject)
@@ -139,7 +135,6 @@ def initializePlugin(mobject):
     except:
         sys.stderr.write('Failed to register command: ' + kPluginCmdName)
         raise
-
 
 def uninitializePlugin(mobject):
     ''' Uninitializes the plug-in. '''

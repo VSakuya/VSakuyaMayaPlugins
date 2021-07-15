@@ -3,6 +3,7 @@ import maya.OpenMaya as OpenMaya
 import maya.OpenMayaMPx as OpenMayaMPx
 import maya.cmds as cmds
 
+# Intro: Move Pivots to object center selected last
 # Plug-in information:
 kPluginCmdName = 'vsaPivotToLastSelect'
 
@@ -35,11 +36,6 @@ class PivotToLastSelectCommand( OpenMayaMPx.MPxCommand):
         else:
             pass
 
-
-
-
-
-
     def isUndoable(self):
         ''' Determines whether or not this command is undoable within Maya. '''
         return True
@@ -59,7 +55,6 @@ def cmdCreator():
     ''' Creates an instance of the command. '''
     return OpenMayaMPx.asMPxPtr(PivotToLastSelectCommand())
 
-
 def initializePlugin(mobject):
     ''' Initializes the plug-in. '''
     mplugin = OpenMayaMPx.MFnPlugin(mobject)
@@ -68,7 +63,6 @@ def initializePlugin(mobject):
     except:
         sys.stderr.write('Failed to register command: ' + kPluginCmdName)
         raise
-
 
 def uninitializePlugin(mobject):
     ''' Uninitializes the plug-in. '''

@@ -3,6 +3,7 @@ import maya.OpenMaya as OpenMaya
 import maya.OpenMayaMPx as OpenMayaMPx
 import maya.cmds as cmds
 
+# Intro: Simple color changer for curve
 # Plug-in information:
 kPluginCmdName = 'vsaCurveColorChanger'
 
@@ -20,13 +21,12 @@ class CurveColorChangerCommand( OpenMayaMPx.MPxCommand ):
         self.dagModifier = OpenMaya.MDagModifier()
         self.createWindow()
 
+    # Color changer implement
     def curveColorChanger(self, object, color):
         cmds.setAttr(object + '.overrideEnabled', 1)
         cmds.setAttr(object + '.overrideRGBColors', 1)
         rgb = ("R", "G", "B")
-        for channel, color in zip(rgb, color):
-            print(channel)
-            print(color)
+        for channel, color in zip(rgb, color): 
             cmds.setAttr(object + ".overrideColor%s" % channel, color)
 
     # Window for control
@@ -43,8 +43,10 @@ class CurveColorChangerCommand( OpenMayaMPx.MPxCommand ):
         self.window = cmds.window(self.window, title=self.title, widthHeight=self.size)
 
         cmds.columnLayout(adjustableColumn=True)
-
+        
+        cmds.separator()
         self.colorInput = cmds.colorSliderGrp(label='Curve Color: ')
+        cmds.separator(height=20, width=100)
         self.applyActionBtn = cmds.button(label='Apply', command=self.btnAction)
 
         # display new window

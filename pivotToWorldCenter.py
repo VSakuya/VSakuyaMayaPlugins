@@ -3,6 +3,7 @@ import maya.OpenMaya as OpenMaya
 import maya.OpenMayaMPx as OpenMayaMPx
 import maya.cmds as cmds
 
+# Intro: Move selected Objects' pivots to World Center (0, 0, 0)
 # Plug-in information:
 kPluginCmdName = 'vsaPivotToWorldCenter'
 
@@ -14,17 +15,12 @@ class PivotToWorldCenterCommand( OpenMayaMPx.MPxCommand):
 
     def doIt( self, args ):
         ''' Command Execution '''
-
-        # Create an instance of MDagModifier to keep track of the created objects,
-        # and to undo their creation in our undoIt() function
         self.dagModifier = OpenMaya.MDagModifier()
 
         # Implement
         getSelection = cmds.ls(selection=True, flatten=True)
         for obj in getSelection:
             cmds.xform(obj, pivots=(0, 0, 0), ws=True)
-
-
 
     def isUndoable(self):
         ''' Determines whether or not this command is undoable within Maya. '''
