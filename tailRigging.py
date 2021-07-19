@@ -27,28 +27,6 @@ class TailRiggingCommand( OpenMayaMPx.MPxCommand ):
         startJoint = getSelection[0]
         endEffector = getSelection[len(getSelection) - 1]
 
-        # Get first joint orientation
-        # WARNING: root joint rotate must be (0,0,0) and all joints on tail must keep in one line
-        tmpJoint = startJoint
-        # Get all parent joint orientation for getting orientaion of the first joint
-        parentJoints = [startJoint]
-        while tmpJoint != None:
-            tmpParent = cmds.listRelatives(tmpJoint, p=True)
-            if tmpParent:
-                tmpType = cmds.objectType(tmpParent)
-                if tmpType == 'joint':
-                    parentJoints.append(tmpParent[0])
-            tmpJoint = tmpParent
-        finalOrient = [0, 0, 0]
-        for item in parentJoints:
-            tmpOrient = cmds.getAttr(item + '.jointOrient')
-            finalOrient[0] = finalOrient[0] + tmpOrient[0][0]
-            finalOrient[1] = finalOrient[1] + tmpOrient[0][1]
-            finalOrient[2] = finalOrient[2] + tmpOrient[0][2]
-
-        # startOrient = cmds.getAttr(getSelection[0] + '.jointOrient')[0]
-        startPerpendicular = [0, finalOrient[1] + 90, finalOrient[2]]
-
         # Create IK
         # Example: [u'ikHandle1', u'effector1', u'curve1']
         ikResult = cmds.ikHandle(sj=startJoint, ee=endEffector, sol='ikSplineSolver', pcv=False, ns=3)
@@ -85,14 +63,22 @@ class TailRiggingCommand( OpenMayaMPx.MPxCommand ):
             tmpPos = [tmpPos[0], tmpPos[1], tmpPos[2]]
 
             # Create controllers
-            newCtrllerName = namePrefix + 'ctrller_' + str(i + 1)
+            nameIndex = i + 1
+            while cmds.objExists(namePrefix + 'ctrller_' + str(nameIndex)):
+                nameIndex += 1
+
+            newCtrllerName = namePrefix + 'ctrller_' + str(nameIndex)
             newCtrller = cmds.circle(n=newCtrllerName, r=ctrllerSize)
+
             # Center pivot
             newCtrllerCenter = cmds.objectCenter(newCtrller[0], gl=True)
             cmds.xform(newCtrller, pivots=newCtrllerCenter, ws=True)
+
             # Move and rotate controller to transform that perpendicular to first joint
+            cmds.parent(newCtrller, startJoint)
+            cmds.setAttr(newCtrller[0] + '.rotate', 0, 90, 0)
+            cmds.parent(newCtrller, w=True)
             cmds.setAttr(newCtrller[0] + '.translate', tmpPos[0], tmpPos[1], tmpPos[2])
-            cmds.setAttr(newCtrller[0] + '.rotate', startPerpendicular[0], startPerpendicular[1], startPerpendicular[2])
             # Freeze transform
             cmds.makeIdentity(newCtrller, apply=True)
             # Make constraint with clusters
